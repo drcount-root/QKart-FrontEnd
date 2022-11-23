@@ -1,0 +1,38 @@
+#add-new-btn {
+    text-transform: none;
+    font-weight: 700;
+    margin: 1rem 0;
+}
+
+.address-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.shipping-container {
+    padding: 2rem 1rem;
+}
+
+.selected {
+    border: 1px solid #00A278;
+    background-color: #E9F5E1;
+}
+
+.not-selected {
+    border: 1px solid #ddd;
+}
+
+p {
+    color: #3C3C3C;
+}
+
+@media screen and (min-width: 768px) {
+    .shipping-container {
+        padding: 2rem 4rem;
+    }
+}

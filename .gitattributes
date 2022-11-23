@@ -1,0 +1,40 @@
+.gitattributes merge=copy-merge
+.gitignore merge=copy-merge
+package.json merge=copy-merge
+package-lock.json merge=copy-merge
+pnpm-lock.yaml merge=copy-merge
+setup.sh merge=copy-merge
+
+# __CRIO__
+__CRIO__/metadata.json merge=copy-merge
+
+# backend/
+backend/db/products.db merge=copy-merge
+backend/routes/auth.js merge=copy-merge
+backend/routes/cart.js merge=copy-merge
+backend/routes/product.js merge=copy-merge
+backend/routes/user.js merge=copy-merge
+backend/package.json merge=copy-merge
+backend/package-lock.json merge=copy-merge
+backend/pnpm-lock.yaml merge=copy-merge
+
+# public/
+public/avatar.png merge=copy-merge
+public/index.html merge=copy-merge
+public/icon.svg merge=copy-merge
+public/robots.txt merge=copy-merge
+public/favicon.ico merge=copy-merge
+public/manifest.json merge=copy-merge
+
+# src/
+src/setupTests.js merge=copy-merge
+
+
+# src/__tests__
+src/__tests__/Login.test.js merge=copy-merge
+src/__tests__/App.test.js merge=copy-merge
+src/__tests__/Register.test.js merge=copy-merge
+src/__tests__/Cart.test.js merge=copy-merge
+src/__tests__/Checkout.test.js merge=copy-merge
+src/__tests__/Products.test.js merge=copy-merge
+src/__tests__/ProductCard.test.js merge=copy-merge

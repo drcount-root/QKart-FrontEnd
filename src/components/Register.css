@@ -1,0 +1,59 @@
+.content {
+  background-image: url("../assets/hero_image.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+.form {
+  background-color: white;
+  border-radius: 10px;
+  padding: 2rem;
+  min-width: 80%;
+  margin: 2rem;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  color: #00a278;
+}
+
+.secondary-action {
+  padding: 1rem 0;
+}
+
+.link {
+  font-weight: 700;
+  text-decoration: none;
+  color: #45c09f;
+}
+
+.link:focus {
+  color: #00a278;
+}
+
+.link:active {
+  color: #45c09f;
+}
+
+.link:visited {
+  color: #45c09f;
+}
+
+.button {
+    background-color: #00a278 !important;
+}
+
+.button:hover {
+    background-color: #00845c !important;
+}
+
+@media screen and (min-width: 768px) {
+  .form {
+    min-width: 24rem;
+  }
+}

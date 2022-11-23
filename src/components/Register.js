@@ -11,7 +11,10 @@ import { useHistory, Link } from "react-router-dom";
 
 const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
-
+  let history = useHistory();
+  let token = localStorage.getItem("token");
+  let username = localStorage.getItem("username");
+  let balance = localStorage.getItem("balance");
 
   /**
    * Definition for register handler
@@ -35,9 +38,63 @@ const Register = () => {
    *      "message": "Username is already taken"
    * }
    */
-  const register = async (formData) => {
+
+  const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  let handleInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
+  const register = async (formData) => {
+    // Condition
+    if (!validateInput(formData)) return;
+    //Start loading
+    setIsLoading(true);
+    try {
+      const data = {
+        username: formData.username,
+        password: formData.password,
+      };
+      // POST call
+      let res = await axios.post(`${config.endpoint}/auth/register`, data);
+      //Redirect to login page
+      history.push("/login");
+
+      //Form reset
+      setFormData({
+        username: "",
+        password: "",
+        confirmPassword: "",
+      });
+      //Success
+      if (res.data.success) {
+        enqueueSnackbar("Registered successfully", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      // If username already exists
+      if (error.response && error.response.status === 400) {
+        enqueueSnackbar(error.response.data.message, { variant: "error" });
+      } else {
+        //Other errors
+        enqueueSnackbar(
+          "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
+          { variant: "error" }
+        );
+      }
+    }
+    //End loading
+    setIsLoading(false);
+  };
+
+  // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
   /**
    * Validate the input values so that any bad or illegal values are not passed to the backend.
    *
@@ -53,9 +110,37 @@ const Register = () => {
    * -    Check that username field is not less than 6 characters in length - "Username must be at least 6 characters"
    * -    Check that password field is not an empty value - "Password is a required field"
    * -    Check that password field is not less than 6 characters in length - "Password must be at least 6 characters"
-   * -    Check that confirmPassword field has the same value as password field - Passwords do not match
+   * -    Check that confirmPassword field has the same value as password field - "Passwords do not match"
    */
+
   const validateInput = (data) => {
+    let { username, password, confirmPassword } = data;
+
+    if (!username) {
+      enqueueSnackbar("Username is a required field", { variant: "warning" });
+      return false;
+    }
+    if (!password) {
+      enqueueSnackbar("Password is a required field", { variant: "warning" });
+      return false;
+    }
+    if (username.length < 6) {
+      enqueueSnackbar("Username must be at least 6 characters", {
+        variant: "warning",
+      });
+      return false;
+    }
+    if (password.length < 6) {
+      enqueueSnackbar("Password must be at least 6 characters", {
+        variant: "warning",
+      });
+      return false;
+    }
+    if (password !== confirmPassword) {
+      enqueueSnackbar("Passwords do not match", { variant: "warning" });
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -77,6 +162,8 @@ const Register = () => {
             name="username"
             placeholder="Enter Username"
             fullWidth
+            onChange={handleInput}
+            value={formData.username || ""}
           />
           <TextField
             id="password"
@@ -87,6 +174,8 @@ const Register = () => {
             helperText="Password must be atleast 6 characters length"
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
+            onChange={handleInput}
+            value={formData.password || ""}
           />
           <TextField
             id="confirmPassword"
@@ -95,9 +184,29 @@ const Register = () => {
             name="confirmPassword"
             type="password"
             fullWidth
+            onChange={handleInput}
+            value={formData.confirmPassword || ""}
           />
+          {isLoading ? (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress color="success" size={25} />
+            </Box>
+          ) : (
+            <Button
+              className="button"
+              variant="contained"
+              onClick={async () => {
+                await register(formData);
+              }}
+            >
+              Register Now
+            </Button>
+          )}
           <p className="secondary-action">
             Already have an account?{" "}
+            <Link className="link" to="/login">
+              Login here
+            </Link>
           </p>
         </Stack>
       </Box>

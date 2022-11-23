@@ -11,7 +11,21 @@ import "./Login.css";
 
 const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
+  let history = useHistory();
 
+  const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  let handleInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
   /**
    * Perform the Login API call
    * @param {{ username: string, password: string }} formData
@@ -37,8 +51,48 @@ const Login = () => {
    *
    */
   const login = async (formData) => {
+    // Condition
+    if (!validateInput(formData)) return;
+    //Start loading
+    setIsLoading(true);
+    try {
+      const data = {
+        username: formData.username,
+        password: formData.password,
+      };
+      // POST call
+      let res = await axios.post(`${config.endpoint}/auth/login`, data);
+      persistLogin(res.data.token, res.data.username, res.data.balance);
+      //Redirect to products page
+      history.push("/");
+      //Form reset
+      // setFormData({
+      //   username: "",
+      //   password: "",
+      // });
+      //Success
+      if (res.data.success) {
+        enqueueSnackbar("Logged in successfully", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      // If username already exists
+      if (error.response && error.response.status === 400) {
+        enqueueSnackbar(error.response.data.message, { variant: "error" });
+      } else {
+        //Other errors
+        enqueueSnackbar(
+          "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
+          { variant: "error" }
+        );
+      }
+    }
+    //End loading
+    setIsLoading(false);
   };
 
+  // TODO: CRIO_TASK_MODULE_LOGIN - Validate the input
   /**
    * Validate the input values so that any bad or illegal values are not passed to the backend.
    *
@@ -54,8 +108,20 @@ const Login = () => {
    * -    Check that password field is not an empty value - "Password is a required field"
    */
   const validateInput = (data) => {
+    let { username, password } = data;
+
+    if (!username) {
+      enqueueSnackbar("Username is a required field", { variant: "warning" });
+      return false;
+    }
+    if (!password) {
+      enqueueSnackbar("Password is a required field", { variant: "warning" });
+      return false;
+    }
+    return true;
   };
 
+  // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
   /**
    * Store the login information so that it can be used to identify the user in subsequent API calls
    *
@@ -72,6 +138,9 @@ const Login = () => {
    * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
    */
   const persistLogin = (token, username, balance) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
+    localStorage.setItem('balance', balance);
   };
 
   return (
@@ -84,6 +153,51 @@ const Login = () => {
       <Header hasHiddenAuthButtons />
       <Box className="content">
         <Stack spacing={2} className="form">
+          <h2 className="title">Login</h2>
+          <TextField
+            id="username"
+            label="Username"
+            variant="outlined"
+            title="Username"
+            name="username"
+            placeholder="Enter Username"
+            fullWidth
+            onChange={handleInput}
+            value={formData.username || ""}
+          />
+          <TextField
+            id="password"
+            variant="outlined"
+            label="Password"
+            name="password"
+            type="password"
+            helperText="Password must be atleast 6 characters length"
+            fullWidth
+            placeholder="Enter a password with minimum 6 characters"
+            onChange={handleInput}
+            value={formData.password || ""}
+          />
+          {isLoading ? (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress color="success" size={25} />
+            </Box>
+          ) : (
+            <Button
+              className="button"
+              variant="contained"
+              onClick={async () => {
+                await login(formData);
+              }}
+            >
+              LOGIN TO QKART
+            </Button>
+          )}
+          <p className="secondary-action">
+            Don’t have an account?{" "}
+            <Link className="link" to="/register">
+              Register now
+            </Link>
+          </p>
         </Stack>
       </Box>
       <Footer />
@@ -92,3 +206,8 @@ const Login = () => {
 };
 
 export default Login;
+
+/* 
+Note; 
+1. Memory leak message after loggedIn as a user 
+*/
